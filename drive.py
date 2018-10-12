@@ -6,7 +6,6 @@ import shutil
 
 import numpy as np
 import socketio
-import eventlet
 import eventlet.wsgi
 from PIL import Image
 from flask import Flask
@@ -60,7 +59,8 @@ def telemetry(sid, data):
         # The current image from the center camera of the car
         imgString = data["image"]
         image = Image.open(BytesIO(base64.b64decode(imgString)))
-        image_array = np.asarray(image)
+        image_resized = image.resize((160, 80), Image.ANTIALIAS)
+        image_array = np.asarray(image_resized)
         steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
 
         throttle = controller.update(float(speed))
